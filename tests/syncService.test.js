@@ -1,9 +1,5 @@
 import { jest } from '@jest/globals';
 
-jest.unstable_mockModule('../services/pim/pimService.js', () => ({
-    fetchProductsFromPIM: jest.fn()
-}));
-
 jest.unstable_mockModule('../services/shopifyService.js', () => ({
     fetchProductByHandle: jest.fn(),
     updateProduct: jest.fn(),
@@ -14,7 +10,8 @@ jest.unstable_mockModule('fs/promises', () => ({
     writeFile: jest.fn(),
 }));
 
-const pimService = await import('../services/pim/pimService.js');
+import * as mockPIM from './services/pim/mockPIM.js';
+
 const shopifyService = await import('../services/shopifyService.js');
 const { fetchAndSyncProducts } = await import('../services/syncService.js');
 const { writeFile } = await import('fs/promises');
@@ -33,7 +30,7 @@ describe.only('fetchAndSyncProducts', () => {
         shopifyService.updateProduct.mockResolvedValue({ updated: true });
         shopifyService.createProduct.mockResolvedValue({ product: { id: 2 } });
 
-        const results = await fetchAndSyncProducts('mockPIM');
+        const results = await fetchAndSyncProducts('mockPIM', mockPIM);
 
         expect(results).toEqual([
             { action: 'updated', id: 1, title: 'Update me' },
@@ -55,7 +52,7 @@ describe.only('fetchAndSyncProducts', () => {
             throw new Error('Mock update error');
         });
 
-        const result = await fetchAndSyncProducts('mockPIM');
+        const result = await fetchAndSyncProducts('mockPIM', mockPIM);
 
         expect(result).toEqual([
             {

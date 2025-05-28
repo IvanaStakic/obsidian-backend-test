@@ -5,9 +5,9 @@ import {
 } from './shopifyService.js';
 import { writeFile } from 'fs/promises';
 
-export const fetchAndSyncProducts = async (pimServiceName) => {
+export const fetchAndSyncProducts = async (pimServiceName, injectedPIMService = null) => {
 
-    const pimModule = await import(`./pim/${pimServiceName}.js`);
+    const pimModule = injectedPIMService || await import(`./pim/${pimServiceName}.js`);
     const { fetchProductsFromPIM } = pimModule;
 
     const pimProducts = await fetchProductsFromPIM();
